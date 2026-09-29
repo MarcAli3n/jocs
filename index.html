@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANETA X Games | Portal de Videojuegos Sci-Fi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neonCyan: '#00f3ff',
+                        neonPurple: '#9d00ff',
+                        neonPink: '#ff007f',
+                        neonGreen: '#00ff66',
+                        darkBg: '#050510',
+                        glassBg: 'rgba(15, 15, 35, 0.65)',
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        glow: {
+                            '0%': { filter: 'drop-shadow(0 0 10px rgba(0, 243, 255, 0.6))' },
+                            '100%': { filter: 'drop-shadow(0 0 25px rgba(157, 0, 255, 0.9))' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS Styles -->
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050510;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #9d00ff, #00f3ff);
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(15, 20, 40, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.25), 0 0 10px rgba(157, 0, 255, 0.2);
+        }
+
+        .glass-nav {
+            background: rgba(5, 5, 16, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Neon Glow Text */
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        .neon-text-purple {
+            text-shadow: 0 0 10px rgba(157, 0, 255, 0.8), 0 0 20px rgba(157, 0, 255, 0.4);
+        }
+
+        /* Background star canvas */
+        #space-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-gray-100 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-neonPurple selection:text-white">
+
+    <!-- Background Animated Stars Canvas -->
+    <canvas id="space-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 glass-nav transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neonPurple to-neonCyan p-0.5 flex items-center justify-center shadow-lg shadow-neonCyan/20">
+                        <div class="w-full h-full bg-darkBg rounded-[10px] flex items-center justify-center">
+                            <i class="fa-solid font-orbitron text-neonCyan fa-planet-ring text-xl animate-pulse"></i>
+                        </div>
+                    </div>
+                    <a href="#" class="font-orbitron font-black text-xl sm:text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-neonCyan via-white to-neonPurple">
+                        PLANETA <span class="text-neonPink">X</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Quick Links -->
+                <nav class="hidden md:flex items-center space-x-8 font-orbitron text-sm font-medium tracking-wide">
+                    <a href="#hero" class="text-gray-300 hover:text-neonCyan transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-house text-xs"></i> Inicio
+                    </a>
+                    <a href="#juegos" class="text-gray-300 hover:text-neonCyan transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-xs"></i> Explorar Juegos
+                    </a>
+                    <a href="#nosotros" class="text-gray-300 hover:text-neonCyan transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-atom text-xs"></i> Acerca de
+                    </a>
+                </nav>
+
+                <!-- Status Badge -->
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-neonGreen/30 bg-neonGreen/10 text-neonGreen text-xs font-orbitron">
+                    <span class="w-2 h-2 rounded-full bg-neonGreen animate-ping"></span>
+                    <span>ONLINE • V2.4</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section id="hero" class="relative pt-12 pb-20 md:pt-20 md:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
+            
+            <!-- Glow background spheres -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-neonPurple/20 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="absolute top-1/3 left-1/3 w-64 h-64 bg-neonCyan/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <!-- Main Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-neonCyan text-xs sm:text-sm font-orbitron tracking-widest uppercase mb-8 backdrop-blur-md animate-float">
+                <i class="fa-solid fa-rocket text-neonPink"></i>
+                <span>Portal de Arcade & Sci-Fi de Próxima Generación</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="font-orbitron font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-white uppercase mb-6 leading-none">
+                <span class="block">PLANETA <span class="text-transparent bg-clip-text bg-gradient-to-r from-neonCyan via-neonPink to-neonPurple animate-glow">X</span></span>
+                <span class="block text-2xl sm:text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500 mt-2">
+                    G A M E S
+                </span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="max-w-2xl text-base sm:text-lg md:text-xl text-gray-300 font-light leading-relaxed mb-10">
+                Embárcate en aventuras galácticas, desafía los récords retro-arcade y domina mundos alienígenas directamente desde tu navegador.
+            </p>
+
+            <!-- Call to Action buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md">
+                <a href="#juegos" class="px-8 py-4 rounded-xl bg-gradient-to-r from-neonCyan to-blue-600 text-darkBg font-orbitron font-bold text-sm tracking-wider uppercase shadow-lg shadow-neonCyan/30 hover:shadow-neonCyan/60 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-gamepad text-lg"></i>
+                    Explorar Juegos
+                </a>
+                <a href="#nosotros" class="px-8 py-4 rounded-xl glass-card text-white font-orbitron font-semibold text-sm tracking-wider uppercase hover:border-neonPurple hover:text-neonCyan transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Saber Más
+                </a>
+            </div>
+
+            <!-- Quick stats bar -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 w-full max-w-4xl glass-card p-6 rounded-2xl border border-white/10">
+                <div class="text-center">
+                    <div class="font-orbitron text-2xl sm:text-3xl font-bold text-neonCyan">100%</div>
+                    <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Gratis en Navegador</div>
+                </div>
+                <div class="text-center border-l border-white/10">
+                    <div class="font-orbitron text-2xl sm:text-3xl font-bold text-neonPurple">Retro/Sci-Fi</div>
+                    <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Estilo Temático</div>
+                </div>
+                <div class="text-center border-l border-white/10">
+                    <div class="font-orbitron text-2xl sm:text-3xl font-bold text-neonPink">0.0s</div>
+                    <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Sin Descargas</div>
+                </div>
+                <div class="text-center border-l border-white/10">
+                    <div class="font-orbitron text-2xl sm:text-3xl font-bold text-neonGreen">HTML5</div>
+                    <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Compatibilidad Total</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Games Catalog Section Header & Search/Filters -->
+        <section id="juegos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                <div>
+                    <h2 class="font-orbitron text-2xl sm:text-4xl font-bold text-white flex items-center gap-3">
+                        <span class="w-3 h-8 bg-gradient-to-b from-neonCyan to-neonPurple rounded-full inline-block"></span>
+                        Catálogo de Misiones
+                    </h2>
+                    <p class="text-gray-400 text-sm mt-2">Selecciona un juego para iniciar la simulación espacial.</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full md:w-80">
+                    <input type="text" id="search-input" placeholder="Buscar juego..." 
+                        class="w-full bg-darkBg/80 border border-white/20 rounded-xl px-4 py-3 pl-11 text-sm text-white focus:outline-none focus:border-neonCyan focus:ring-1 focus:ring-neonCyan transition-all font-sans placeholder-gray-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Filter Badges -->
+            <div class="flex flex-wrap gap-2 sm:gap-3 mb-10" id="filter-buttons">
+                <button data-filter="all" class="filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider transition-all bg-gradient-to-r from-neonCyan to-blue-600 text-darkBg shadow-lg shadow-neonCyan/20">
+                    <i class="fa-solid fa-border-all mr-2"></i>Todos
+                </button>
+                <button data-filter="Sci-Fi" class="filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider text-gray-300 hover:text-white glass-card transition-all">
+                    <i class="fa-solid fa-user-astronaut mr-2 text-neonCyan"></i>Sci-Fi
+                </button>
+                <button data-filter="Arcade" class="filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider text-gray-300 hover:text-white glass-card transition-all">
+                    <i class="fa-solid fa-gamepad mr-2 text-neonPink"></i>Arcade
+                </button>
+                <button data-filter="Acción" class="filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider text-gray-300 hover:text-white glass-card transition-all">
+                    <i class="fa-solid fa-gun mr-2 text-neonPurple"></i>Acción
+                </button>
+                <button data-filter="Estrategia" class="filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider text-gray-300 hover:text-white glass-card transition-all">
+                    <i class="fa-solid fa-brain mr-2 text-neonGreen"></i>Estrategia
+                </button>
+            </div>
+
+            <!-- Games Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="games-grid">
+
+                <!-- Card 1 -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-category="Arcade,Sci-Fi" data-title="Arcade Retro Invaders">
+                    <div>
+                        <!-- Thumbnail Header with SVG Graphic -->
+                        <div class="relative h-48 w-full bg-gradient-to-br from-purple-900/50 via-slate-900 to-indigo-950 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,243,255,0.15)_0,transparent_70%)]"></div>
+                            <!-- Styled SVG Banner Icon -->
+                            <div class="text-6xl text-neonCyan group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]">
+                                <i class="fa-solid fa-ghost"></i>
+                            </div>
+                            <span class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-orbitron font-bold uppercase tracking-wider bg-neonPurple/20 border border-neonPurple/50 text-neonPurple">
+                                Arcade
+                            </span>
+                        </div>
+                        
+                        <!-- Info Content -->
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-orbitron text-neonCyan flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-400"></i> 4.9 / 5.0
+                                </span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-clock mr-1"></i> Retro Clásico</span>
+                            </div>
+                            <h3 class="font-orbitron font-bold text-xl text-white group-hover:text-neonCyan transition-colors mb-2">
+                                Arcade Retro Invaders
+                            </h3>
+                            <p class="text-gray-300 text-sm leading-relaxed font-light">
+                                Defiende la Tierra de hordas alienígenas pixeladas en este frenético homenaje a las recreativas de los 80s.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="p-6 pt-0">
+                        <a href="juego1.html" class="w-full py-3 px-4 rounded-xl bg-white/5 border border-neonCyan/30 text-neonCyan font-orbitron text-xs font-bold uppercase tracking-wider hover:bg-neonCyan hover:text-darkBg transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]">
+                            <span>Jugar Ahora</span>
+                            <i class="fa-solid fa-play text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-category="Acción,Sci-Fi" data-title="Cosmic Runner">
+                    <div>
+                        <!-- Thumbnail Header -->
+                        <div class="relative h-48 w-full bg-gradient-to-br from-pink-950/50 via-slate-900 to-slate-950 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,127,0.15)_0,transparent_70%)]"></div>
+                            <div class="text-6xl text-neonPink group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(255,0,127,0.6)]">
+                                <i class="fa-solid fa-person-running"></i>
+                            </div>
+                            <span class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-orbitron font-bold uppercase tracking-wider bg-neonPink/20 border border-neonPink/50 text-neonPink">
+                                Acción
+                            </span>
+                        </div>
+                        
+                        <!-- Info Content -->
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-orbitron text-neonPink flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-400"></i> 4.8 / 5.0
+                                </span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-bolt mr-1"></i> Alta Velocidad</span>
+                            </div>
+                            <h3 class="font-orbitron font-bold text-xl text-white group-hover:text-neonPink transition-colors mb-2">
+                                Cosmic Runner
+                            </h3>
+                            <p class="text-gray-300 text-sm leading-relaxed font-light">
+                                Corre a través de plataformas suspendidas sobre pozos de neón y esquiva obstáculos intergalácticos sin mirar atrás.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="p-6 pt-0">
+                        <a href="juego2.html" class="w-full py-3 px-4 rounded-xl bg-white/5 border border-neonPink/30 text-neonPink font-orbitron text-xs font-bold uppercase tracking-wider hover:bg-neonPink hover:text-darkBg transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(255,0,127,0.4)]">
+                            <span>Jugar Ahora</span>
+                            <i class="fa-solid fa-play text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-category="Estrategia,Sci-Fi" data-title="Misión Marte 2099">
+                    <div>
+                        <!-- Thumbnail Header -->
+                        <div class="relative h-48 w-full bg-gradient-to-br from-amber-950/50 via-slate-900 to-red-950 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,100,0,0.15)_0,transparent_70%)]"></div>
+                            <div class="text-6xl text-amber-500 group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]">
+                                <i class="fa-solid fa-mars-distance"></i>
+                            </div>
+                            <span class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-orbitron font-bold uppercase tracking-wider bg-amber-500/20 border border-amber-500/50 text-amber-400">
+                                Estrategia
+                            </span>
+                        </div>
+                        
+                        <!-- Info Content -->
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-orbitron text-amber-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-400"></i> 4.7 / 5.0
+                                </span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-shield-halved mr-1"></i> Táctico</span>
+                            </div>
+                            <h3 class="font-orbitron font-bold text-xl text-white group-hover:text-amber-400 transition-colors mb-2">
+                                Misión Marte 2099
+                            </h3>
+                            <p class="text-gray-300 text-sm leading-relaxed font-light">
+                                Construye la base humana definitiva en el planeta rojo mientras gestionas recursos y repeles amenazas marcianas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="p-6 pt-0">
+                        <a href="juego3.html" class="w-full py-3 px-4 rounded-xl bg-white/5 border border-amber-500/30 text-amber-400 font-orbitron text-xs font-bold uppercase tracking-wider hover:bg-amber-500 hover:text-darkBg transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+                            <span>Jugar Ahora</span>
+                            <i class="fa-solid fa-play text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-category="Acción,Arcade" data-title="Nave Estelar 1984">
+                    <div>
+                        <!-- Thumbnail Header -->
+                        <div class="relative h-48 w-full bg-gradient-to-br from-indigo-950/50 via-slate-900 to-purple-950 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(157,0,255,0.15)_0,transparent_70%)]"></div>
+                            <div class="text-6xl text-neonPurple group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(157,0,255,0.6)]">
+                                <i class="fa-solid fa-shuttle-space"></i>
+                            </div>
+                            <span class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-orbitron font-bold uppercase tracking-wider bg-neonPurple/20 border border-neonPurple/50 text-neonPurple">
+                                Arcade
+                            </span>
+                        </div>
+                        
+                        <!-- Info Content -->
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-orbitron text-neonPurple flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-400"></i> 4.9 / 5.0
+                                </span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-fire mr-1"></i> Shoot 'Em Up</span>
+                            </div>
+                            <h3 class="font-orbitron font-bold text-xl text-white group-hover:text-neonPurple transition-colors mb-2">
+                                Nave Estelar 1984
+                            </h3>
+                            <p class="text-gray-300 text-sm leading-relaxed font-light">
+                                Pilota una nave espacial avanzada a través de cinturones de asteroides y flotas enemigas en un clásico vertical shooter.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="p-6 pt-0">
+                        <a href="juego4.html" class="w-full py-3 px-4 rounded-xl bg-white/5 border border-neonPurple/30 text-neonPurple font-orbitron text-xs font-bold uppercase tracking-wider hover:bg-neonPurple hover:text-darkBg transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(157,0,255,0.4)]">
+                            <span>Jugar Ahora</span>
+                            <i class="fa-solid fa-play text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-category="Estrategia,Sci-Fi" data-title="Cyber Defense Grid">
+                    <div>
+                        <!-- Thumbnail Header -->
+                        <div class="relative h-48 w-full bg-gradient-to-br from-emerald-950/50 via-slate-900 to-teal-950 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,102,0.15)_0,transparent_70%)]"></div>
+                            <div class="text-6xl text-neonGreen group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(0,255,102,0.6)]">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <span class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-orbitron font-bold uppercase tracking-wider bg-neonGreen/20 border border-neonGreen/50 text-neonGreen">
+                                Estrategia
+                            </span>
+                        </div>
+                        
+                        <!-- Info Content -->
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-orbitron text-neonGreen flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-amber-400"></i> 4.6 / 5.0
+                                </span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-tower-broadcast mr-1"></i> Tower Defense</span>
+                            </div>
+                            <h3 class="font-orbitron font-bold text-xl text-white group-hover:text-neonGreen transition-colors mb-2">
+                                Cyber Defense Grid
+                            </h3>
+                            <p class="text-gray-300 text-sm leading-relaxed font-light">
+                                Protege el núcleo del mainframe cibernético instalando torretas plasma y cortafuegos contra virus informáticos.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="p-6 pt-0">
+                        <a href="juego5.html" class="w-full py-3 px-4 rounded-xl bg-white/5 border border-neonGreen/30 text-neonGreen font-orbitron text-xs font-bold uppercase tracking-wider hover:bg-neonGreen hover:text-darkBg transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(0,255,102,0.4)]">
+                            <span>Jugar Ahora</span>
+                            <i class="fa-solid fa-play text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Empty State Search Result -->
+            <div id="no-results" class="hidden text-center py-16 glass-card rounded-2xl mt-8">
+                <i class="fa-solid fa-satellite-dish text-5xl text-gray-500 mb-4 animate-bounce"></i>
+                <h3 class="font-orbitron text-xl text-white font-bold mb-2">Sin señales detectadas</h3>
+                <p class="text-gray-400 text-sm">No encontramos juegos que coincidan con tus criterios de búsqueda.</p>
+            </div>
+        </section>
+
+        <!-- About Portal Section -->
+        <section id="nosotros" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-16">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 relative overflow-hidden">
+                <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-neonCyan/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="max-w-3xl">
+                    <span class="text-neonCyan font-orbitron text-xs uppercase tracking-widest block mb-2">Acerca del Sistema</span>
+                    <h2 class="font-orbitron text-3xl sm:text-4xl font-bold text-white mb-6">
+                        Bienvenido a la red <span class="text-neonPurple">PLANETA X</span>
+                    </h2>
+                    <p class="text-gray-300 leading-relaxed mb-6">
+                        PLANETA X games es un portal diseñado para amantes de la ciencia ficción, la estética neón cyberpunk y los juegos clásicos arcade. Todos nuestras experiencias están optimizadas para ejecutarse directamente en tu navegador web de forma rápida y gratuita.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/10">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-bolt text-neonCyan text-xl"></i>
+                            <span class="text-sm text-gray-200">Rendimiento Ultra Rápido</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-mobile-screen text-neonPink text-xl"></i>
+                            <span class="text-sm text-gray-200">100% Adaptado a Móviles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-darkBg/95 backdrop-blur-md relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <!-- Brand Info -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-neonPurple to-neonCyan p-0.5 flex items-center justify-center">
+                            <div class="w-full h-full bg-darkBg rounded-[6px] flex items-center justify-center">
+                                <i class="fa-solid font-orbitron text-neonCyan fa-planet-ring text-sm"></i>
+                            </div>
+                        </div>
+                        <span class="font-orbitron font-bold text-lg tracking-wider text-white">
+                            PLANETA <span class="text-neonPink">X</span> games
+                        </span>
+                    </div>
+                    <p class="text-gray-400 text-sm max-w-sm leading-relaxed mb-4">
+                        Tu destino definitivo para videojuegos retro, arcade y de ciencia ficción directamente en la web.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-neonCyan hover:border-neonCyan transition-all">
+                            <i class="fa-brands fa-discord"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-neonCyan hover:border-neonCyan transition-all">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-neonCyan hover:border-neonCyan transition-all">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation links -->
+                <div>
+                    <h4 class="font-orbitron text-sm font-bold text-white uppercase tracking-wider mb-4">Explorar</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#hero" class="hover:text-neonCyan transition-colors">Inicio</a></li>
+                        <li><a href="#juegos" class="hover:text-neonCyan transition-colors">Catálogo Completo</a></li>
+                        <li><a href="#nosotros" class="hover:text-neonCyan transition-colors">Acerca de nosotros</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal / Info -->
+                <div>
+                    <h4 class="font-orbitron text-sm font-bold text-white uppercase tracking-wider mb-4">Sistema</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-neonGreen"></span> Servidores Activos</li>
+                        <li>Estado del Portal: <span class="text-neonCyan">Óptimo</span></li>
+                        <li>Protocolo HTML5 / WebGL</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+                <p>&copy; 2026 PLANETA X games. Todos los derechos reservados.</p>
+                <p class="font-orbitron text-[10px] tracking-widest uppercase">Diseño de Interfaz Galáctica</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts: Canvas Particle Stars Background + Dynamic Filter & Search -->
+    <script>
+        // ----------------------------------------------------
+        // 1. STARFIELD BACKGROUND CANVAS ANIMATION
+        // ----------------------------------------------------
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initStars();
+        });
+
+        class Star {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 1.8 + 0.2;
+                this.alpha = Math.random() * 0.8 + 0.2;
+                this.speed = Math.random() * 0.3 + 0.05;
+                // Color palette for stars (cyan, purple, white)
+                const colors = ['#ffffff', '#00f3ff', '#9d00ff', '#ff007f'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.y -= this.speed;
+                if (this.y < 0) {
+                    this.y = height;
+                    this.x = Math.random() * width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        let stars = [];
+        function initStars() {
+            stars = [];
+            const starCount = Math.floor((width * height) / 3000);
+            for (let i = 0; i < starCount; i++) {
+                stars.push(new Star());
+            }
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        initStars();
+        animateStars();
+
+        // ----------------------------------------------------
+        // 2. SEARCH AND CATEGORY FILTERING LOGIC
+        // ----------------------------------------------------
+        const searchInput = document.getElementById('search-input');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const gameCards = document.querySelectorAll('.game-card');
+        const noResults = document.getElementById('no-results');
+
+        let activeCategory = 'all';
+        let searchQuery = '';
+
+        function filterGames() {
+            let visibleCount = 0;
+
+            gameCards.forEach(card => {
+                const categories = card.getAttribute('data-category');
+                const title = card.getAttribute('data-title').toLowerCase();
+
+                const matchesCategory = activeCategory === 'all' || categories.includes(activeCategory);
+                const matchesSearch = title.includes(searchQuery.toLowerCase());
+
+                if (matchesCategory && matchesSearch) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        // Category Buttons Click Event
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state style
+                filterButtons.forEach(b => {
+                    b.className = 'filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider text-gray-300 hover:text-white glass-card transition-all';
+                });
+
+                btn.className = 'filter-btn px-5 py-2.5 rounded-xl font-orbitron text-xs font-semibold tracking-wider transition-all bg-gradient-to-r from-neonCyan to-blue-600 text-darkBg shadow-lg shadow-neonCyan/20';
+
+                activeCategory = btn.getAttribute('data-filter');
+                filterGames();
+            });
+        });
+
+        // Search Input Keyup Event
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            filterGames();
+        });
+    </script>
+</body>
+</html>
